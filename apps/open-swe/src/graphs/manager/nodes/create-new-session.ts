@@ -32,6 +32,7 @@ import { isLocalMode } from "@open-swe/shared/open-swe/local-mode";
 import { regenerateInstallationToken } from "../../../utils/github/regenerate-token.js";
 import { createLogger, LogLevel } from "../../../utils/logger.js";
 import { shouldCreateIssue } from "../../../utils/should-create-issue.js";
+import { trackLangGraphExecution } from "../../../metrics/index.js";
 
 const logger = createLogger(LogLevel.INFO, "CreateNewSession");
 
@@ -113,20 +114,32 @@ ${ISSUE_CONTENT_CLOSE_TAG}`,
     messages: inputMessages,
     branchName: state.branchName ?? getBranchName(config),
   };
-  await langGraphClient.runs.create(newManagerThreadId, MANAGER_GRAPH_ID, {
-    input: {},
-    command: {
-      update: commandUpdate,
-      goto: "start-planner",
-    },
-    config: {
-      recursion_limit: 400,
-      configurable: getCustomConfigurableFields(config),
-    },
-    ifNotExists: "create",
-    streamResumable: true,
-    streamMode: OPEN_SWE_STREAM_MODE as StreamMode[],
-  });
+  const startTime = Date.now();
+  try {
+    await langGraphClient.runs.create(newManagerThreadId, MANAGER_GRAPH_ID, {
+      input: {},
+      command: {
+        update: commandUpdate,
+        goto: "start-planner",
+      },
+      config: {
+        recursion_limit: 400,
+        configurable: getCustomConfigurableFields(config),
+      },
+      ifNotExists: "create",
+      streamResumable: true,
+      streamMode: OPEN_SWE_STREAM_MODE as StreamMode[],
+    });
+    
+    // Track successful LangGraph execution
+    const durationSeconds = (Date.now() - startTime) / 1000;
+    trackLangGraphExecution('manager', 'success', durationSeconds);
+  } catch (error) {
+    // Track failed LangGraph execution
+    const durationSeconds = (Date.now() - startTime) / 1000;
+    trackLangGraphExecution('manager', 'error', durationSeconds);
+    throw error;
+  }
 
   return {
     messages: [

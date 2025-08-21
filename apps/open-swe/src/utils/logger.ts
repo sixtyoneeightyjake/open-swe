@@ -71,51 +71,86 @@ function logWithOptionalIds(styledPrefix: string, message: string, data?: any) {
   }
 }
 
-export function createLogger(level: LogLevel, prefix: string) {
-  const hash = simpleHash(prefix);
-  const color = COLORS[hash % COLORS.length];
-
-  // Use plain prefix in production, styled prefix otherwise
-  const styledPrefix =
-    process.env.NODE_ENV === "production"
-      ? `[${prefix}]`
-      : `${BOLD}${color}[${prefix}]${RESET}`;
-
+// Helper function to determine if a log should be output based on level hierarchy
+function shouldLog(messageLevel: LogLevel, configuredLevel: LogLevel): boolean {
+  const levels = [LogLevel.DEBUG, LogLevel.INFO, LogLevel.WARN, LogLevel.ERROR];
+  const messageIndex = levels.indexOf(messageLevel);
+  const configuredIndex = levels.indexOf(configuredLevel);
+  
   // In production, only allow warn and error logs
   const isProduction = process.env.NODE_ENV === "production";
+  if (isProduction && (messageLevel === LogLevel.DEBUG || messageLevel === LogLevel.INFO)) {
+    return false;
+  }
+  
+  return messageIndex >= configuredIndex;
+}
+
+export function createLogger(level: LogLevel, prefix: string) {
+  const colorIndex = simpleHash(prefix) % COLORS.length;
+  const color = COLORS[colorIndex];
+  const styledPrefix = `${color}${BOLD}[${prefix}]${RESET}`;
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  const logStructured = (logLevel: LogLevel, message: string, data?: any) => {
+    if (isProduction) {
+      const logEntry = {
+        timestamp: new Date().toISOString(),
+        level: logLevel,
+        service: 'open-swe-backend',
+        prefix,
+        message,
+        ...getThreadAndRunIds(),
+        ...(data && { data })
+      };
+      console.log(JSON.stringify(logEntry));
+    } else {
+      logWithOptionalIds(styledPrefix, message, data);
+    }
+  };
 
   return {
     debug: (message: string, data?: any) => {
-      if (!isProduction && level === LogLevel.DEBUG) {
-        logWithOptionalIds(styledPrefix, message, data);
+      if (shouldLog(LogLevel.DEBUG, level)) {
+        logStructured(LogLevel.DEBUG, message, data);
       }
     },
     info: (message: string, data?: any) => {
-      if (
-        !isProduction &&
-        (level === LogLevel.INFO || level === LogLevel.DEBUG)
-      ) {
-        logWithOptionalIds(styledPrefix, message, data);
+      if (shouldLog(LogLevel.INFO, level)) {
+        logStructured(LogLevel.INFO, message, data);
       }
     },
     warn: (message: string, data?: any) => {
-      if (
-        level === LogLevel.WARN ||
-        level === LogLevel.INFO ||
-        level === LogLevel.DEBUG
-      ) {
-        logWithOptionalIds(styledPrefix, message, data);
+      if (shouldLog(LogLevel.WARN, level)) {
+        logStructured(LogLevel.WARN, message, data);
       }
     },
     error: (message: string, data?: any) => {
-      if (
-        level === LogLevel.ERROR ||
-        level === LogLevel.WARN ||
-        level === LogLevel.INFO ||
-        level === LogLevel.DEBUG
-      ) {
-        logWithOptionalIds(styledPrefix, message, data);
+      if (shouldLog(LogLevel.ERROR, level)) {
+        logStructured(LogLevel.ERROR, message, data);
       }
     },
+  };
+}
+
+// Request logging middleware for Hono
+export function requestLogger() {
+  return async (c: any, next: any) => {
+    const start = Date.now();
+    const method = c.req.method;
+    const url = c.req.url;
+    
+    await next();
+    
+    const duration = Date.now() - start;
+    const status = c.res.status;
+    
+    const logger = createLogger(LogLevel.INFO, 'HTTP');
+    logger.info(`${method} ${url}`, {
+      status,
+      duration: `${duration}ms`,
+      userAgent: c.req.header('User-Agent'),
+      ip: c.req.header('X-Forwarded-For') || c.req.header('X-Real-IP')
+    });
   };
 }

@@ -21,6 +21,9 @@
     "dev": {
       "dependsOn": ["^dev"]
     },
+    "start": {
+      "dependsOn": ["^build"]
+    },
     "test": {
       "dependsOn": ["^test"]
     },

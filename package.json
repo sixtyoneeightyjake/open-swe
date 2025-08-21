@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
+    "start": "turbo start",
+    "start:prod": "NODE_ENV=production turbo start",
     "turbo:command": "turbo",
     "format": "turbo format",
     "clean": "rm -rf .turbo || true && turbo clean",

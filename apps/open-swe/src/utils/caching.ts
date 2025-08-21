@@ -12,6 +12,7 @@ import {
 import { CacheMetrics, ModelTokenData } from "@open-swe/shared/open-swe/types";
 import { createLogger, LogLevel } from "./logger.js";
 import { calculateCostSavings } from "@open-swe/shared/caching";
+import { trackCacheHit, trackCacheMiss, trackTokenUsage } from "../metrics/index.js";
 
 const logger = createLogger(LogLevel.INFO, "Caching");
 
@@ -42,6 +43,22 @@ export function trackCachePerformance(
   const cacheHitRate =
     totalInputTokens > 0 ? metrics.cacheReadInputTokens / totalInputTokens : 0;
   const costSavings = calculateCostSavings(metrics).totalSavings;
+
+  // Track Prometheus metrics
+  if (metrics.cacheReadInputTokens > 0) {
+    trackCacheHit('llm_cache', costSavings);
+  }
+  if (metrics.inputTokens > 0) {
+    trackCacheMiss('llm_cache');
+  }
+  
+  // Track token usage
+  trackTokenUsage(
+    model,
+    totalInputTokens,
+    metrics.outputTokens,
+    costSavings
+  );
 
   logger.info("Cache Performance", {
     model,

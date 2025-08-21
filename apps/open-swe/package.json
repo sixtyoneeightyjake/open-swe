@@ -10,6 +10,7 @@
   "type": "module",
   "scripts": {
     "dev": "langgraphjs dev --no-browser --config ../../langgraph.json",
+    "start": "langgraphjs up --config ../../langgraph.production.json --host 0.0.0.0 --port 8123",
     "clean": "rm -rf .turbo ../../.langgraph_api ./dist || true",
     "build": "tsc",
     "lint": "eslint .",
@@ -45,6 +46,7 @@
     "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.26",
     "langsmith": "^0.3.29",
+    "prom-client": "^15.1.3",
     "uuid": "^11.0.5",
     "zod": "^3.25.32"
   },

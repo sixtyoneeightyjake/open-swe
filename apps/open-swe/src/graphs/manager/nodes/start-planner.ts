@@ -23,6 +23,7 @@ import { getRecentUserRequest } from "../../../utils/user-request.js";
 import { StreamMode } from "@langchain/langgraph-sdk";
 import { regenerateInstallationToken } from "../../../utils/github/regenerate-token.js";
 import { shouldCreateIssue } from "../../../utils/should-create-issue.js";
+import { trackLangGraphExecution } from "../../../metrics/index.js";
 
 const logger = createLogger(LogLevel.INFO, "StartPlanner");
 
@@ -74,6 +75,7 @@ export async function startPlanner(
         : {}),
     };
 
+    const startTime = Date.now();
     const run = await langGraphClient.runs.create(
       plannerThreadId,
       PLANNER_GRAPH_ID,
@@ -93,6 +95,10 @@ export async function startPlanner(
         streamMode: OPEN_SWE_STREAM_MODE as StreamMode[],
       },
     );
+
+    // Track successful LangGraph execution
+    const durationSeconds = (Date.now() - startTime) / 1000;
+    trackLangGraphExecution('planner', 'success', durationSeconds);
 
     return {
       plannerSession: {
