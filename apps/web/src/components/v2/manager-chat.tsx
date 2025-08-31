@@ -221,7 +221,7 @@ export function ManagerChat({
                           <span className="text-muted-foreground text-xs font-medium">
                             {message.type === "human"
                               ? githubUser?.login || "You"
-                              : "Open SWE"}
+                              : "Agent Mojo"}
                           </span>
                           <div className="opacity-0 transition-opacity group-hover:opacity-100">
                             <MessageCopyButton content={messageContentString} />

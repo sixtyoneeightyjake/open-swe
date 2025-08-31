@@ -26,7 +26,7 @@ export async function getInstallationRepositories(
     headers: {
       Authorization: `Bearer ${installationToken}`,
       Accept: "application/vnd.github.v3+json",
-      "User-Agent": "YourAppName",
+      "User-Agent": "AgentMojo-Agent",
     },
   });
 
@@ -62,7 +62,7 @@ export async function getRepositoryBranches(
     {
       headers: {
         Accept: "application/vnd.github.v3+json",
-        "User-Agent": "OpenSWE-Agent",
+        "User-Agent": "AgentMojo-Agent",
       },
     },
   );
@@ -79,7 +79,7 @@ export async function getRepositoryBranches(
     {
       headers: {
         Accept: "application/vnd.github.v3+json",
-        "User-Agent": "OpenSWE-Agent",
+        "User-Agent": "AgentMojo-Agent",
       },
     },
   );
@@ -111,7 +111,7 @@ export async function getRepositoryBranches(
         {
           headers: {
             Accept: "application/vnd.github.v3+json",
-            "User-Agent": "OpenSWE-Agent",
+            "User-Agent": "AgentMojo-Agent",
           },
         },
       );
@@ -145,7 +145,7 @@ export async function getRepository(
     {
       headers: {
         Accept: "application/vnd.github.v3+json",
-        "User-Agent": "OpenSWE-Agent",
+        "User-Agent": "AgentMojo-Agent",
       },
     },
   );
@@ -172,7 +172,7 @@ export async function searchBranch(
       {
         headers: {
           Accept: "application/vnd.github.v3+json",
-          "User-Agent": "OpenSWE-Agent",
+          "User-Agent": "AgentMojo-Agent",
         },
       },
     );
@@ -247,7 +247,7 @@ export async function getPullRequest(inputs: {
       {
         headers: {
           Accept: "application/vnd.github.v3+json",
-          "User-Agent": "OpenSWE-Agent",
+          "User-Agent": "AgentMojo-Agent",
         },
       },
     );

@@ -45,7 +45,7 @@ async function handler(req: NextRequest) {
     const headers = new Headers();
     headers.set("Authorization", `Bearer ${token}`);
     headers.set("Accept", "application/vnd.github.v3+json");
-    headers.set("User-Agent", "OpenSWE-Proxy");
+  headers.set("User-Agent", "AgentMojo-Proxy");
 
     if (req.headers.has("Content-Type")) {
       headers.set("Content-Type", req.headers.get("Content-Type")!);

@@ -17,7 +17,7 @@ import { useThreadsStatus } from "@/hooks/useThreadsStatus";
 import { cn } from "@/lib/utils";
 import { threadsToMetadata } from "@/lib/thread-utils";
 import { UserPopover } from "@/components/user-popover";
-import { OpenSWELogo } from "@/components/icons/openswe-logo";
+import { AgentMojoLogo } from "@/components/icons/agent-mojo-logo";
 
 type FilterStatus =
   | "all"
@@ -128,10 +128,7 @@ function AllThreadsPageContent() {
             <ArrowLeft className="h-3 w-3" />
           </Button>
           <div className="flex items-center gap-2">
-            <OpenSWELogo
-              width={120}
-              height={18}
-            />
+            <AgentMojoLogo size="sm" />
           </div>
           <div className="ml-auto flex items-center gap-4">
             <div className="flex items-center gap-2">

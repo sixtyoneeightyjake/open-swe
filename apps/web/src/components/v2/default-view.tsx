@@ -31,7 +31,7 @@ import { useState, useMemo } from "react";
 import { threadsToMetadata } from "@/lib/thread-utils";
 import { Settings, BookOpen } from "lucide-react";
 import NextLink from "next/link";
-import { OpenSWELogo } from "../icons/openswe-logo";
+import { AgentMojoLogo, InsertCoin } from "../icons/agent-mojo-logo";
 import { OpenSWEIcon } from "../icons/openswe-icon";
 import { DEFAULT_CONFIG_KEY, useConfigStore } from "@/hooks/useConfigStore";
 
@@ -130,10 +130,7 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
       <div className="border-border bg-card border-b px-4 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <OpenSWELogo
-              width={120}
-              height={18}
-            />
+            <AgentMojoLogo size="sm" />
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -151,13 +148,17 @@ export function DefaultView({ threads, threadsLoading }: DefaultViewProps) {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-4xl space-y-6 p-4">
+          <div className="flex flex-col items-center gap-1 py-2">
+            <AgentMojoLogo size="lg" />
+            <InsertCoin />
+          </div>
           <GitHubInstallationBanner />
           <ApiKeyBanner />
           <IssuesRequiredBanner />
           {/* Terminal Chat Input */}
           <Card
             className={cn(
-              "border-border bg-card py-0",
+              "border-border bg-card arcade-panel py-0",
               dragOver
                 ? "border-primary border-2 border-dotted"
                 : "border border-solid",

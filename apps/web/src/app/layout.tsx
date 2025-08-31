@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Inter, Press_Start_2P } from "next/font/google";
 import React from "react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,9 +12,17 @@ const inter = Inter({
   display: "swap",
 });
 
+const arcade = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  preload: true,
+  display: "swap",
+  variable: "--font-arcade",
+});
+
 export const metadata: Metadata = {
-  title: "Open SWE",
-  description: "Open SWE UX by LangChain",
+  title: "Agent Mojo",
+  description: "Agent Mojo • Arcade-themed AI Coding Agent",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
@@ -57,7 +66,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={cn(inter.className, arcade.variable)}>
         <ThemeProvider
           defaultTheme="system"
           storageKey="theme"
