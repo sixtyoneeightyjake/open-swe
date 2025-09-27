@@ -1,0 +1,31 @@
+app = "open-swe-agent"
+primary_region = "iad"
+
+[build]
+# If you prefer to build locally, leave image empty and Fly will build using Dockerfile.
+# You can also set an image to deploy a pre-built image.
+  image = ""
+
+[env]
+# Runtime environment variables should be set with `flyctl secrets set`.
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+
+  [services.checks]
+    # HTTP health check to ensure the app is ready. Change path if you add a different endpoint.
+    type = "http"
+    path = "/health"
+    interval = 10000
+    timeout = 2000
+    grace_period = "5s"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
