@@ -1,0 +1,31 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: docker/agent.Dockerfile
+    env_file:
+      - docker/agent.env
+    volumes:
+      - ./docker/agent.env:/deps/open-swe/apps/open-swe/.env:ro
+    ports:
+      - "${AGENT_PORT:-2024}:2024"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}
+        NEXT_PUBLIC_ALLOWED_USERS_LIST: ${NEXT_PUBLIC_ALLOWED_USERS_LIST:-[]}
+        NEXT_PUBLIC_GITHUB_APP_CLIENT_ID: ${NEXT_PUBLIC_GITHUB_APP_CLIENT_ID:-}
+        NEXT_PUBLIC_ASSISTANT_ID: ${NEXT_PUBLIC_ASSISTANT_ID:-}
+    env_file:
+      - docker/web.env
+    environment:
+      LANGGRAPH_API_URL: ${LANGGRAPH_API_URL:-http://agent:2024}
+    depends_on:
+      - agent
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    restart: unless-stopped
